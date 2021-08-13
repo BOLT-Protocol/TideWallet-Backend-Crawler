@@ -1,38 +1,29 @@
-# MerMer-framework
-MerMer Framework for Front End and Back End
+# TideWallet-Backend-Crawler
+Blockchain Crawler and parser manager for TideWallet
 
-## Install
-```shell
-npm i -g mermer
+## Set Config
+
+```
+// copy sample config to private folder(if not exist, create it)
+cp default.config.toml ./private/config.toml
+
+// set your env
+vi ./private/config.toml
 ```
 
-## Initial New Project
-```shell
-mermer init /path/to/your/new/project
+* if you want to use btc mainnet crawler
 ```
+// if you want to use btc mainnet crawler
+[blockchain]
+type = 'bitcoin_mainnet'
 
-### edit package
-```shell
-vi /path/to/your/new/project/package.json
+[database]
+dbName = "bitcoin_mainnet"
+// ...
 ```
-
-### edit config
-```shell
-cp /path/to/your/new/project/default.config.toml /path/to/your/new/project/private/config.toml
-vi /path/to/your/new/project/private/config.toml
+## Run Crawler
 ```
-```toml
-[api]
-pathname = [
-  "get | /,/version | Static.Utils.readPackageInfo"
-]
-
-# [method] | [path] | [execute function]
-```
-
-## Run Project
-```
-cd /path/to/your/new/project/
+cd /path/to/TideWallet-Backend-Crawler
 npm install
-npm start
+pm2 start . -n TideWallet-Crawler
 ```

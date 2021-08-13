@@ -18,6 +18,31 @@ logLevel = 'info'
 # type = 'cafeca'
 type = 'titan'
 
+[database]
+protocol = "postgres"
+host = "postgres"
+port = ""
+user = ""
+password = ""
+dbName = ""
+logging = false
+autoReconnect = true
+ormEnable = true
+  [database.dialectOptions]
+  connectTimeout = 3000
+
+  [database.pool]
+  max = 2  #not less than 2
+
+[syncInterval]
+ethereum = 15000
+cafeca = 15000
+bitcoin = 450000
+bitcoin_cash = 450000
+titan = 1500
+fee = 3600000
+pending = 15000
+
 [blockchain.ethereum_mainnet]
 blockchain_id = "8000003C"
 protocol = "http:"
@@ -81,23 +106,6 @@ protocol = "http:"
 hostname = "127.0.0.1"
 port = 8545
 path = "/"
-
-
-[database]
-protocol = "postgres"
-host = "postgres"
-port = ""
-user = ""
-password = ""
-dbName = ""
-logging = false
-autoReconnect = true
-ormEnable = true
-  [database.dialectOptions]
-  connectTimeout = 3000
-
-  [database.pool]
-  max = 2  #not less than 2
 
 [rabbitmq]
 host = "amqp://localhost"

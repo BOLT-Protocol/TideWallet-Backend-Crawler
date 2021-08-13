@@ -2,8 +2,7 @@ const webpack = require('webpack');
 const fs = require('fs');
 const path = require('path');
 
-function getExternals()
-{
+function getExternals() {
   const nodeModules = fs.readdirSync(path.join(process.cwd(), 'node_modules'));
   return nodeModules.reduce((ext, mod) => {
     ext[mod] = `commonjs ${mod}`;
@@ -17,14 +16,14 @@ const frontend = {
   output: {
     path: path.resolve(__dirname, 'build/frontend'),
     filename: 'main.js',
-    chunkFilename: '[id].js'
+    chunkFilename: '[id].js',
   },
   module: {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoEmitOnErrorsPlugin()
-  ]
+    new webpack.NoEmitOnErrorsPlugin(),
+  ],
 };
 
 const backend = {
@@ -34,30 +33,30 @@ const backend = {
   output: {
     path: path.resolve(__dirname, 'build/backend'),
     filename: 'main.js',
-    chunkFilename: '[id].js'
+    chunkFilename: '[id].js',
   },
   externals: getExternals(),
   node: {
     __filename: true,
-    __dirname: true
+    __dirname: true,
   },
   module: {
     rules: [{
       test: /\.js$/,
       loader: 'babel-loader',
-      exclude: /(node_modules)/
+      exclude: /(node_modules)/,
     }],
-    exprContextCritical: false
+    exprContextCritical: false,
   },
   plugins: [
     new webpack.IgnorePlugin(/\.(css|less|scss|svg|png|jpe?g|png)$/),
     new webpack.LoaderOptionsPlugin({
       minimize: true,
-      debug: false
-    })
-  ]
-}
+      debug: false,
+    }),
+  ],
+};
 
 module.exports = [
-  frontend
+  frontend,
 ];

@@ -27,10 +27,47 @@ module.exports = (sequelize, DataTypes) => sequelize.define('BlockScanned', {
     type: DataTypes.TEXT,
     allowNull: false,
   },
+  transaction_count: {
+    type: DataTypes.INTEGER,
+  },
+  miner: {
+    type: DataTypes.STRING,
+  },
+  difficulty: {
+    type: DataTypes.STRING,
+  },
+  transactions_root: {
+    type: DataTypes.STRING,
+  },
+  size: {
+    type: DataTypes.BIGINT,
+  },
+  transaction_volume: {
+    type: DataTypes.STRING,
+  },
+  gas_used: {
+    type: DataTypes.BIGINT,
+  },
+  block_reward: {
+    type: DataTypes.STRING,
+  },
+  block_fee: {
+    type: DataTypes.STRING,
+  },
+  extra_data: {
+    type: DataTypes.STRING,
+  },
+  uncles: {
+    type: DataTypes.STRING,
+  },
 }, {
   timestamps: false,
   tableName: 'BlockScanned',
   charset: 'utf8',
   collate: 'utf8_unicode_ci',
-  indexes: [{ fields: ['blockchain_id'] }],
+  indexes: [
+    { fields: ['blockchain_id'] },
+    { unique: true, fields: ['blockchain_id', 'block'] },
+    { fields: ['blockchain_id', 'timestamp'] },
+  ],
 });

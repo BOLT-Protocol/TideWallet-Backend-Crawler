@@ -49,19 +49,6 @@ class Manager extends Bot {
         this.fiatCurrencyRateModel = this.database.db.FiatCurrencyRate;
         this.currencyModel = this.database.db.Currency;
 
-        if (this.config.syncSwitch.cryptoRate) {
-          setInterval(() => {
-            this.syncCryptoRate();
-          }, this.cryptoRateSyncInterval);
-          this.syncCryptoRate();
-        }
-
-        if (this.config.syncSwitch.rate) {
-          setInterval(() => {
-            this.syncRate();
-          }, this.rateSyncInterval);
-          this.syncRate();
-        }
         return this;
       });
   }
@@ -182,8 +169,7 @@ class Manager extends Bot {
   createManager() {
     this.logger.log('createManager');
     const result = [];
-    const { syncSwitch } = this.config;
-    const syncSwitchSet = Object.keys(syncSwitch);
+    const { type } = this.config.blockchain;
 
     /**
      * 'bitcoin_mainnet',
@@ -195,141 +181,138 @@ class Manager extends Bot {
      * 'cafeca'
      * 'titan'
      */
-    syncSwitchSet.forEach((blockchianName) => {
-      if (!syncSwitch[blockchianName]) return;
-      this.logger.log(blockchianName);
-      switch (blockchianName) {
-        case 'bitcoin_mainnet':
-          result.push(
-            new BtcCrawlerManager(
-              this.config,
-              this.database.db.bitcoin_mainnet,
-              this.logger,
-            ),
-          );
-          result.push(
-            new BtcParserManager(
-              this.config,
-              this.database.db.bitcoin_mainnet,
-              this.logger,
-            ),
-          );
-          break;
-        case 'bitcoin_testnet':
-          result.push(
-            new BtcTestnetCrawlerManager(
-              this.config,
-              this.database.db.bitcoin_testnet,
-              this.logger,
-            ),
-          );
-          result.push(
-            new BtcTestnetParserManager(
-              this.config,
-              this.database.db.bitcoin_testnet,
-              this.logger,
-            ),
-          );
-          break;
-        case 'bitcoin_cash_mainnet':
-          result.push(
-            new BchCrawlerManager(
-              this.config,
-              this.database.db.bitcoin_cash_mainnet,
-              this.logger,
-            ),
-          );
-          result.push(
-            new BchParserManager(
-              this.config,
-              this.database.db.bitcoin_cash_mainnet,
-              this.logger,
-            ),
-          );
-          break;
-        case 'bitcoin_cash_testnet':
-          result.push(
-            new BchTestnetCrawlerManager(
-              this.config,
-              this.database.db.bitcoin_cash_testnet,
-              this.logger,
-            ),
-          );
-          result.push(
-            new BchTestnetParserManager(
-              this.config,
-              this.database.db.bitcoin_cash_testnet,
-              this.logger,
-            ),
-          );
-          break;
-        case 'ethereum_mainnet':
-          result.push(
-            new EthCrawlerManager(
-              this.config,
-              this.database.db.ethereum_mainnet,
-              this.logger,
-            ),
-          );
-          result.push(
-            new EthParserManager(
-              this.config,
-              this.database.db.ethereum_mainnet,
-              this.logger,
-            ),
-          );
-          break;
-        case 'ethereum_ropsten':
-          result.push(
-            new EthRopstenCrawlerManager(
-              this.config,
-              this.database.db.ethereum_ropsten,
-              this.logger,
-            ),
-          );
-          result.push(
-            new EthRopstenParserManager(
-              this.config,
-              this.database.db.ethereum_ropsten,
-              this.logger,
-            ),
-          );
-          break;
-        case 'cafeca':
-          result.push(
-            new CfcCrawlerManager(
-              this.config,
-              this.database.db.cafeca,
-              this.logger,
-            ),
-          );
-          result.push(
-            new CfcParserManager(
-              this.config,
-              this.database.db.cafeca,
-              this.logger,
-            ),
-          );
-          break;
-        case 'titan':
-          result.push(
-            new TtnCrawlerManager(
-              this.config,
-              this.database.db.titan,
-              this.logger,
-            ),
-          );
-          result.push(
-            new TtnParserManager(
-              this.config,
-              this.database.db.titan,
-              this.logger,
-            ),
-          );
-          break;
-        default:
-      }
-    });
+    this.logger.log(type);
+    switch (type) {
+      case 'bitcoin_mainnet':
+        result.push(
+          new BtcCrawlerManager(
+            this.config,
+            this.database.db,
+            this.logger,
+          ),
+        );
+        result.push(
+          new BtcParserManager(
+            this.config,
+            this.database.db,
+            this.logger,
+          ),
+        );
+        break;
+      case 'bitcoin_testnet':
+        result.push(
+          new BtcTestnetCrawlerManager(
+            this.config,
+            this.database.db,
+            this.logger,
+          ),
+        );
+        result.push(
+          new BtcTestnetParserManager(
+            this.config,
+            this.database.db,
+            this.logger,
+          ),
+        );
+        break;
+      case 'bitcoin_cash_mainnet':
+        result.push(
+          new BchCrawlerManager(
+            this.config,
+            this.database.db,
+            this.logger,
+          ),
+        );
+        result.push(
+          new BchParserManager(
+            this.config,
+            this.database.db,
+            this.logger,
+          ),
+        );
+        break;
+      case 'bitcoin_cash_testnet':
+        result.push(
+          new BchTestnetCrawlerManager(
+            this.config,
+            this.database.db,
+            this.logger,
+          ),
+        );
+        result.push(
+          new BchTestnetParserManager(
+            this.config,
+            this.database.db,
+            this.logger,
+          ),
+        );
+        break;
+      case 'ethereum_mainnet':
+        result.push(
+          new EthCrawlerManager(
+            this.config,
+            this.database.db,
+            this.logger,
+          ),
+        );
+        result.push(
+          new EthParserManager(
+            this.config,
+            this.database.db,
+            this.logger,
+          ),
+        );
+        break;
+      case 'ethereum_ropsten':
+        result.push(
+          new EthRopstenCrawlerManager(
+            this.config,
+            this.database.db,
+            this.logger,
+          ),
+        );
+        result.push(
+          new EthRopstenParserManager(
+            this.config,
+            this.database.db,
+            this.logger,
+          ),
+        );
+        break;
+      case 'cafeca':
+        result.push(
+          new CfcCrawlerManager(
+            this.config,
+            this.database.db,
+            this.logger,
+          ),
+        );
+        result.push(
+          new CfcParserManager(
+            this.config,
+            this.database.db,
+            this.logger,
+          ),
+        );
+        break;
+      case 'titan':
+        result.push(
+          new TtnCrawlerManager(
+            this.config,
+            this.database.db,
+            this.logger,
+          ),
+        );
+        result.push(
+          new TtnParserManager(
+            this.config,
+            this.database.db,
+            this.logger,
+          ),
+        );
+        break;
+      default:
+    }
     return result;
   }
 

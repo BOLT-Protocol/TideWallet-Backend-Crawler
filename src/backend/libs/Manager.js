@@ -29,8 +29,6 @@ class Manager extends Bot {
     super();
     this.name = 'Manager';
     this._crawlerManagers = [];
-    this.rateSyncInterval = 86400000;
-    this.cryptoRateSyncInterval = 3600000;
   }
 
   init({
@@ -58,112 +56,6 @@ class Manager extends Bot {
       this.initManager();
       return this;
     });
-  }
-
-  syncRate() {
-    const opt = {
-      protocol: 'https:',
-      port: '',
-      hostname: 'rate.bot.com.tw',
-      path: '/xrt/fltxt/0/day',
-    };
-
-    ecrequest.get(opt).then(async (rs) => {
-      const parseObject = rs.data
-        .toString()
-        .split('\n')
-        .map((item) => item.split(/[ ]+/));
-
-      const usdItem = parseObject.find((item) => item[0] === 'USD');
-      const usdRate = new BigNumber(usdItem[3]);
-      for (const item of parseObject) {
-        await this._updateFiatRate(item[0], new BigNumber(item[3]).dividedBy(usdRate).toFixed());
-      }
-      // update TWD
-      await this._updateFiatRate('TWD', new BigNumber(1).dividedBy(usdRate).toFixed());
-    });
-  }
-
-  async _updateFiatRate(symbol, rate) {
-    const findCurrency = await this.database.db[
-      Utils.defaultDBInstanceName
-    ].Currency.findOne({
-      where: { symbol, type: 0 },
-    });
-    if (findCurrency) {
-      const findRate = await this.database.db[
-        Utils.defaultDBInstanceName
-      ].FiatCurrencyRate.findOne({
-        where: { currency_id: findCurrency.currency_id },
-      });
-
-      if (findRate) {
-        // if found, update it
-        await this.database.db[
-          Utils.defaultDBInstanceName
-        ].FiatCurrencyRate.update(
-          { rate },
-          {
-            where: {
-              fiatCurrencyRate_id: findRate.fiatCurrencyRate_id,
-              currency_id: findCurrency.currency_id,
-            },
-          },
-        );
-      } else {
-        // if not found, create
-        await this.database.db[
-          Utils.defaultDBInstanceName
-        ].FiatCurrencyRate.findOrCreate({
-          where: { currency_id: findCurrency.currency_id },
-          defaults: {
-            fiatCurrencyRate_id: uuidv4(),
-            currency_id: findCurrency.currency_id,
-            rate,
-          },
-        });
-      }
-    }
-  }
-
-  syncCryptoRate() {
-    const BTCObj = {
-      asset_id: '5b1ea92e584bf50020130612', symbol: 'BTC', dbOp: 'bitcoin_mainnet',
-    };
-    const BCHObj = {
-      asset_id: '5b1ea92e584bf5002013061c', symbol: 'BCH', dbOp: 'bitcoin_cash_mainnet',
-    };
-    const ETHObj = {
-      asset_id: '5b755dacd5dd99000b3d92b2', symbol: 'ETH', dbOp: 'ethereum_mainnet',
-    };
-    const USDID = '5b1ea92e584bf50020130615';
-
-    for (const crypto of [BTCObj, BCHObj, ETHObj]) {
-      const opt = {
-        protocol: 'https:',
-        port: '',
-        hostname: 'api.cryptoapis.io',
-        path: `/v1/exchange-rates/${crypto.asset_id}/${USDID}`,
-        headers: {
-          'X-API-Key': this.config.cryptoapis.key,
-          'Content-Type': 'application/json',
-        },
-      };
-
-      // eslint-disable-next-line no-loop-func
-      ecrequest
-        .get(opt)
-        .then(async (rs) => {
-          const { payload } = JSON.parse(rs.data.toString());
-          await this.database.db[crypto.dbOp].Currency.update(
-            { exchange_rate: payload.weightedAveragePrice },
-            { where: { currency_id: crypto.asset_id } },
-          );
-        })
-        .catch((e) => {
-          this.logger.error('syncCryptoRate error:', e);
-        });
-    }
   }
 
   createManager() {

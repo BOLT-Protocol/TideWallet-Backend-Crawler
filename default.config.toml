@@ -100,7 +100,14 @@ path = "/"
 user = ""
 password = ""
 
-[blockchain.titan]
+# [blockchain.titan]
+# blockchain_id = "80001F51"
+# protocol = "http:"
+# hostname = "127.0.0.1"
+# port = 8545
+# path = "/"
+
+[blockchain.tidetime]
 blockchain_id = "80001F51"
 protocol = "http:"
 hostname = "127.0.0.1"

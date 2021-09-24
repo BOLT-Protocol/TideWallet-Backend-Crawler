@@ -13,6 +13,7 @@ const EthCrawlerManager = require('./EthCrawlerManager');
 const EthRopstenCrawlerManager = require('./EthRopstenCrawlerManager');
 const CfcCrawlerManager = require('./CfcCrawlerManager');
 const TtnCrawlerManager = require('./TtnCrawlerManager');
+const TtCrawlerManager = require('./TtCrawlerManager');
 
 // parser
 const BtcParserManager = require('./BtcParserManager');
@@ -23,6 +24,7 @@ const EthParserManager = require('./EthParserManager');
 const EthRopstenParserManager = require('./EthRopstenParserManager');
 const CfcParserManager = require('./CfcParserManager');
 const TtnParserManager = require('./TtnParserManager');
+const TtParserManager = require('./TtParserManager');
 
 class Manager extends Bot {
   constructor() {
@@ -72,6 +74,7 @@ class Manager extends Bot {
      * 'ethereum_ropsten',
      * 'cafeca'
      * 'titan'
+     * 'tidetime'
      */
     this.logger.log(type);
     switch (type) {
@@ -187,16 +190,33 @@ class Manager extends Bot {
           ),
         );
         break;
-      case 'titan':
+      // temp remove
+      // case 'titan':
+      //   result.push(
+      //     new TtnCrawlerManager(
+      //       this.config,
+      //       this.database.db,
+      //       this.logger,
+      //     ),
+      //   );
+      //   result.push(
+      //     new TtnParserManager(
+      //       this.config,
+      //       this.database.db,
+      //       this.logger,
+      //     ),
+      //   );
+      //   break;
+      case 'tidetime':
         result.push(
-          new TtnCrawlerManager(
+          new TtCrawlerManager(
             this.config,
             this.database.db,
             this.logger,
           ),
         );
         result.push(
-          new TtnParserManager(
+          new TtParserManager(
             this.config,
             this.database.db,
             this.logger,

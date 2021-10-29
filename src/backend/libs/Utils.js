@@ -13,6 +13,8 @@ const ecRequest = require('ecrequest');
 const log4js = require('log4js');
 const initialORM = require('../../database/models');
 const blockchainNetworks = require('./data/blockchainNetworks');
+const ResponseFormat = require('./ResponseFormat');
+const Codes = require('./Codes');
 
 class Utils {
   static waterfallPromise(jobs) {
@@ -724,6 +726,66 @@ class Utils {
 
   static getBlockchainConfig(blockchain_id) {
     return Object.values(this.config.blockchain).find((info) => info.blockchain_id === blockchain_id) || false;
+  }
+
+  static blockchainIDToDBName(blockchainID) {
+    const { db_name } = Utils.blockchainIDToBlockInfo(blockchainID);
+    return db_name;
+  }
+
+  static blockchainIDToNetworkID(blockchainID) {
+    const { network_id } = Utils.blockchainIDToBlockInfo(blockchainID);
+    return network_id;
+  }
+
+  static blockchainIDToBlockInfo(blockchainID) {
+    const networks = Object.values(blockchainNetworks);
+    const findIndex = networks.findIndex(
+      (item) => item.blockchain_id === blockchainID,
+    );
+    if (findIndex === -1) {
+      throw new ResponseFormat({
+        message: 'blockchain id not found',
+        code: Codes.BLOCKCHAIN_ID_NOT_FOUND,
+      });
+    }
+    return networks[findIndex];
+  }
+
+  static async ethGetBalanceByAddress(blockchain_id, address, decimals = 18) {
+    const blockchainConfig = this.getBlockchainConfig(blockchain_id);
+    if (!blockchainConfig) {
+      throw new ResponseFormat({
+        message: 'blockchain_id not found',
+        code: Codes.BLOCKCHAIN_ID_NOT_FOUND,
+      });
+    }
+
+    const option = { ...blockchainConfig };
+    option.data = {
+      jsonrpc: '2.0',
+      method: 'eth_getBalance',
+      params: [address, 'pending'],
+      id: dvalue.randomID(),
+    };
+
+    const checkId = option.data.id;
+    const data = await this.ETHRPC(option);
+    if (data instanceof Object) {
+      if (data.id === checkId) {
+        // use address find account
+        try {
+          if (!data.result) return '0';
+          return new BigNumber(data.result)
+            .dividedBy(new BigNumber(10 ** decimals))
+            .toFixed();
+
+          // eslint-disable-next-line no-empty
+        } catch (e) {
+          return '0';
+        }
+      }
+    }
   }
 }
 

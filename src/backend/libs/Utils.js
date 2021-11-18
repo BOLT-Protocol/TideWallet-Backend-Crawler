@@ -5,6 +5,7 @@ const path = require('path');
 const BigNumber = require('bignumber.js');
 const bchaddr = require('bchaddrjs');
 const bs58check = require('bs58check');
+const util = require('util');
 
 const toml = require('toml');
 const i18n = require('i18n');
@@ -532,6 +533,18 @@ class Utils {
       error: (...data) => this.loggerAdapter.error('%s', data),
       debug: (...data) => this.loggerAdapter.debug('%s', data),
       trace: (...data) => this.loggerAdapter.trace('%s', data),
+      // ++ tmp for fcm debug
+      fcm: (...data) => {
+        const log_stdout = process.stdout;
+        const log_file = fs.createWriteStream(`${__dirname}/../../../logs/fcm.log`, { flags: 'a' });
+
+        const _date = new Date();
+
+        const dateString = `${_date.getFullYear()}-${_date.getMonth() + 1}-${_date.getDate()} ${_date.getHours()}:${_date.getMinutes()}`;
+
+        log_file.write(`${dateString} ${util.format(data)}\n`);
+        log_stdout.write(`${dateString} ${util.format(data)}\n`);
+      },
     });
   }
 

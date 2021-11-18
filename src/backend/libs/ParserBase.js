@@ -74,7 +74,7 @@ class ParserBase {
     }
   }
 
-  async checkRegistAddress(address) {
+  async checkRegistAddress(address, transaction) {
     this.logger.debug(`[${this.constructor.name}] checkRegistAddress(${address})`);
 
     try {
@@ -87,6 +87,7 @@ class ParserBase {
             where: { blockchain_id: this.bcid },
           },
         ],
+        transaction,
       });
       return accountAddress;
     } catch (error) {
@@ -140,25 +141,20 @@ class ParserBase {
     }
   }
 
-  async setAddressTransaction(accountAddress_id, transaction_id, amount, direction) {
+  async setAddressTransaction(accountAddress_id, transaction_id, amount, direction, address, transaction) {
     this.logger.debug(`[${this.constructor.name}] setAddressTransaction(${accountAddress_id}, ${transaction_id}, ${direction})`);
     try {
-      const result = await this.addressTransactionModel.findOrCreate({
-        where: {
-          currency_id: this.currencyInfo.currency_id,
-          accountAddress_id,
-          transaction_id,
-          amount,
-          direction,
-        },
-        defaults: {
-          currency_id: this.currencyInfo.currency_id,
-          accountAddress_id,
-          transaction_id,
-          amount,
-          direction,
-        },
+      const result = await this.addressTransactionModel.create({
+        currency_id: this.currencyInfo.currency_id,
+        accountAddress_id,
+        transaction_id,
+        amount,
+        direction,
+        address,
+      }, {
+        transaction,
       });
+
       return result;
     } catch (error) {
       this.logger.error(`[${this.constructor.name}] setAddressTransaction(${accountAddress_id}, ${transaction_id}, ${direction}) error: ${error}`);
